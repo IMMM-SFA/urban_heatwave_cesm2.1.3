@@ -1509,7 +1509,7 @@ contains
          eflx_anthro             => energyflux_inst%eflx_anthro_patch       , & ! Input:  [real(r8) (:)   ]  total anthropogenic heat flux (W/m**2)  
          eflx_gnet               => energyflux_inst%eflx_gnet_patch         , & ! Output: [real(r8) (:)   ]  net ground heat flux into the surface (W/m**2)
          dgnetdT                 => energyflux_inst%dgnetdT_patch           , & ! Output: [real(r8) (:)   ]  temperature derivative of ground net heat flux  
-         
+
          sabg                    => solarabs_inst%sabg_patch                , & ! Input:  [real(r8) (:)   ]  solar radiation absorbed by ground (W/m**2)
          sabg_soil               => solarabs_inst%sabg_soil_patch           , & ! Input:  [real(r8) (:)   ]  solar radiation absorbed by soil (W/m**2)
          sabg_snow               => solarabs_inst%sabg_snow_patch           , & ! Input:  [real(r8) (:)   ]  solar radiation absorbed by snow (W/m**2)
@@ -1593,8 +1593,10 @@ contains
                           - (eflx_sh_grnd(p) + qflx_evap_soi(p)*htvp(c) + qflx_tran_veg(p)*hvap) &
                           + eflx_wasteheat_patch(p) + eflx_heat_from_ac_patch(p) + eflx_traffic_patch(p) &
                           + eflx_ventilation_patch(p)
-		     if ( IsSimpleBuildTemp() ) then
+		               if ( IsSimpleBuildTemp() ) then
                         eflx_anthro(p)   = eflx_wasteheat_patch(p) + eflx_traffic_patch(p)
+                     else if ( IsProgBuildTemp() ) then
+                        eflx_anthro(p) = eflx_wasteheat_patch(p) + eflx_heat_from_ac_patch(p) + eflx_traffic_patch(p) + eflx_ventilation_patch(p)
                      end if
                      eflx_gnet_snow   = eflx_gnet(p)
                      eflx_gnet_soil   = eflx_gnet(p)

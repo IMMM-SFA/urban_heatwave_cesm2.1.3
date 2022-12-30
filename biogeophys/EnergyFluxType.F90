@@ -607,6 +607,24 @@ contains
          avgflag='A', long_name='sensible heat flux from heating/cooling sources of urban waste heat', &
          ptr_patch=this%eflx_wasteheat_patch, set_nourb=0._r8, c2l_scale_type='urbanf')
 
+    this%eflx_heat_from_ac_patch(begp:endp) = spval
+    call hist_addfld1d (fname='HEAT_FROM_AC', units='W/m^2',  &
+         avgflag='A', long_name='sensible heat flux put into canyon due to heat removed from air conditioning', &
+         ptr_patch=this%eflx_heat_from_ac_patch, set_nourb=0._r8, c2l_scale_type='urbanf')
+
+    if ( is_simple_buildtemp )then
+       this%eflx_anthro_patch(begp:endp) = spval
+       call hist_addfld1d (fname='Qanth', units='W/m^2',  &
+            avgflag='A', long_name='anthropogenic heat flux', &
+            ptr_patch=this%eflx_anthro_patch, set_nourb=0._r8, c2l_scale_type='urbanf', &
+            default='inactive')
+    else if ( is_prog_buildtemp ) then
+       call hist_addfld1d (fname='Qanth', units='W/m^2',  &
+            avgflag='A', long_name='anthropogenic heat flux (WASTEHEAT + HEAT_FROM_AC + VENTILATION)', &
+            ptr_patch=this%eflx_anthro_patch, set_nourb=0._r8, c2l_scale_type='urbanf', &
+            default='inactive')       
+    end if 
+
     if ( is_prog_buildtemp )then
        this%eflx_ventilation_patch(begp:endp) = spval
        call hist_addfld1d (fname='VENTILATION', units='W/m^2',  &
@@ -630,19 +648,6 @@ contains
     call hist_addfld1d (fname='URBAN_HEAT_FROM_AC', units='W/m^2',  &
          avgflag='A', long_name='sensible heat flux put into canyon due to heat removed from air conditioning at urban scale', &
          ptr_lunit=this%eflx_heat_from_ac_lun, set_nourb=spval, l2g_scale_type='unity', default='inactive')
-
-    this%eflx_heat_from_ac_patch(begp:endp) = spval
-    call hist_addfld1d (fname='HEAT_FROM_AC', units='W/m^2',  &
-         avgflag='A', long_name='sensible heat flux put into canyon due to heat removed from air conditioning', &
-         ptr_patch=this%eflx_heat_from_ac_patch, set_nourb=0._r8, c2l_scale_type='urbanf')
-
-    if ( is_simple_buildtemp )then
-       this%eflx_anthro_patch(begp:endp) = spval
-       call hist_addfld1d (fname='Qanth', units='W/m^2',  &
-            avgflag='A', long_name='anthropogenic heat flux', &
-            ptr_patch=this%eflx_anthro_patch, set_nourb=0._r8, c2l_scale_type='urbanf', &
-            default='inactive')
-    end if
 
     this%taux_patch(begp:endp) = spval
     call hist_addfld1d (fname='TAUX', units='kg/m/s^2',  &

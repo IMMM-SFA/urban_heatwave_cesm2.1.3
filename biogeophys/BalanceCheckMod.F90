@@ -287,6 +287,11 @@ contains
           fsr                     =>    solarabs_inst%fsr_patch                 , & ! Input:  [real(r8) (:)   ]  solar radiation reflected (W/m**2)      
           sabv                    =>    solarabs_inst%sabv_patch                , & ! Input:  [real(r8) (:)   ]  solar radiation absorbed by vegetation (W/m**2)
           sabg                    =>    solarabs_inst%sabg_patch                , & ! Input:  [real(r8) (:)   ]  solar radiation absorbed by ground (W/m**2)
+
+          fsa_u                   =>    solarabs_inst%fsa_u_patch               , & ! Output: [real(r8) (:)   ]  urban solar radiation absorbed (total) (W/m**2)   
+          fsa_r                   =>    solarabs_inst%fsa_r_patch               , & ! Output: [real(r8) (:)   ]  rural solar radiation absorbed (total) (W/m**2)
+
+          eflx_ventilation        =>   energyflux_inst%eflx_ventilation_lun     , & ! Output:  [real(r8) (:)   ]  sensible heat flux from building ventilation (W/m**2)
           
           elai                    =>    canopystate_inst%elai_patch             , & ! Input:  [real(r8) (:,:)]  
           esai                    =>    canopystate_inst%esai_patch             , & ! Input:  [real(r8) (:,:)]  
@@ -572,12 +577,17 @@ contains
              if (.not. lun%urbpoi(l)) then
                 errseb(p) = sabv(p) + sabg_chk(p) + forc_lwrad(c) - eflx_lwrad_out(p) &
                      - eflx_sh_tot(p) - eflx_lh_tot(p) - eflx_soil_grnd(p)
+
+                if (lun%itype(l) == istsoil .or. lun%itype(l) == istcrop) fsa_r(p)  = sabv(p) + sabg_chk(p)   
              else
                 errseb(p) = sabv(p) + sabg(p) &
                      - eflx_lwrad_net(p) &
                      - eflx_sh_tot(p) - eflx_lh_tot(p) - eflx_soil_grnd(p) &
                      + eflx_wasteheat_patch(p) + eflx_heat_from_ac_patch(p) + eflx_traffic_patch(p) &
                      + eflx_ventilation_patch(p)
+
+                !fsa_u(p)  = sabv(p) + sabg(p) 
+                !eflx_ventilation(l) =  eflx_ventilation_patch(p)*(1._r8-lun%wtlunit_roof(l))
              end if
              !TODO MV - move this calculation to a better place - does not belong in BalanceCheck 
              netrad(p) = fsa(p) - eflx_lwrad_net(p) 
