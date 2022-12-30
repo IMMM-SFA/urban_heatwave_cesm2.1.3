@@ -283,6 +283,7 @@ contains
          eflx_sh_h2osfc      =>   energyflux_inst%eflx_sh_h2osfc_patch      , & ! Output: [real(r8) (:)   ]  sensible heat flux from soil (W/m**2) [+ to atm]  
          eflx_traffic        =>   energyflux_inst%eflx_traffic_lun          , & ! Output: [real(r8) (:)   ]  traffic sensible heat flux (W/m**2)               
          eflx_wasteheat      =>   energyflux_inst%eflx_wasteheat_lun        , & ! Output: [real(r8) (:)   ]  sensible heat flux from urban heating/cooling sources of waste heat (W/m**2)
+         eflx_ventilation    =>   energyflux_inst%eflx_ventilation_lun      , & ! Input:  [real(r8) (:)   ]  sensible heat flux from building ventilation (W/m**2)
          eflx_urban_ac       =>   energyflux_inst%eflx_urban_ac_lun         , & ! Input:  [real(r8) (:)   ]  urban air conditioning flux (W/m**2)              
          eflx_heat_from_ac   =>   energyflux_inst%eflx_heat_from_ac_lun     , & ! Output: [real(r8) (:)   ]  sensible heat flux put back into canyon due to removal by AC (W/m**2)
          eflx_urban_heat     =>   energyflux_inst%eflx_urban_heat_lun       , & ! Input:  [real(r8) (:)   ]  urban heating flux (W/m**2)
@@ -306,6 +307,14 @@ contains
          l = filter_nourbanl(fl)
          taf(l) = spval
          qaf(l) = spval
+         if ( IsSimpleBuildTemp() )then
+            eflx_urban_ac_col(c) = spval
+            eflx_urban_heat_col(c) = spval
+         else
+            eflx_urban_ac(l) = spval
+            eflx_urban_heat(l) = spval
+            eflx_ventilation(l) = spval
+         end if            
       end do
 
       ! Get time step
